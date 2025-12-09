@@ -13,12 +13,27 @@ Semua dependensi tersebut akan di-install otomatis melalui `run_game.bat`.
 
 ## Cara Install & Menjalankan
 
-1. **Install Python 3.11.0**
+### 1. **Install Python 3.11.0**
 
-   - [64-bit](https://www.python.org/ftp/python/3.11.0/python-3.11.0-amd64.exe)  
-   - [32-bit](https://www.python.org/ftp/python/3.11.0/python-3.11.0.exe)
+Unduh installer:
 
-2. Setelah Python selesai dipasang, cukup jalankan dengan double-click:
+- [64-bit](https://www.python.org/ftp/python/3.11.0/python-3.11.0-amd64.exe)  
+- [32-bit](https://www.python.org/ftp/python/3.11.0/python-3.11.0.exe)
+
+Saat membuka installer:
+
+1. **Jangan** langsung klik *Install Now*  
+2. Pilih **Customize installation**  
+3. **Jangan centang** opsi **“Add python.exe to PATH”**  
+4. Lanjutkan Next → Install
+
+Setelah Python selesai dipasang, lanjutkan ke langkah berikutnya.
+
+---
+
+### 2. **Jalankan Game**
+
+Cukup double-click:
 
 ```bash
 run_game.bat
@@ -37,9 +52,6 @@ Script tersebut akan:
 
 ```
 arkanoid-3d/
-├── .idea/
-├── .venv/
-├── pycache/
 ├── .gitignore
 ├── background.jpeg
 ├── background.jpg
