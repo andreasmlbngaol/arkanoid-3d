@@ -2,7 +2,7 @@ import pygame
 from OpenGL.GL import *
 
 class Table:
-    def __init__(self, width=8, height=10, depth=0.5, texture_file="background.jpg"):
+    def __init__(self, width=8, height=10, depth=0.5, texture_file="background.jpeg"):
         self.width = width
         self.height = height
         self.depth = depth
