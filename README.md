@@ -15,10 +15,8 @@ Semua dependensi tersebut akan di-install otomatis melalui `run_game.bat`.
 
 1. **Install Python 3.11.0**
 
-   - 64-bit:  
-     https://www.python.org/ftp/python/3.11.0/python-3.11.0-amd64.exe  
-   - 32-bit:  
-     https://www.python.org/ftp/python/3.11.0/python-3.11.0.exe  
+   - [64-bit](https://www.python.org/ftp/python/3.11.0/python-3.11.0-amd64.exe)  
+   - [32-bit](https://www.python.org/ftp/python/3.11.0/python-3.11.0.exe)
 
 2. Setelah Python selesai dipasang, cukup jalankan dengan double-click:
 
