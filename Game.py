@@ -88,6 +88,96 @@ class Game:
             self.camera_rot_y += dx * 0.5
             self.last_mouse_pos = event.pos
 
+    def _check_paddle_collision(self):
+        # batas (bounding box) bola
+        ball_left = self.ball.x - self.ball.radius
+        ball_right = self.ball.x + self.ball.radius
+        ball_bottom = self.ball.y - self.ball.radius
+
+        # batas (bounding box) paddle
+        paddle_left = self.paddle.x - self.paddle.width / 2
+        paddle_right = self.paddle.x + self.paddle.width / 2
+        paddle_top = self.paddle.y + self.paddle.height / 2
+        paddle_bottom = self.paddle.y - self.paddle.height / 2
+
+        # cek interseksi
+        # Apakah bola ada dalam rentang horizontal paddle?
+        collision_x = ball_right >= paddle_left and ball_left <= paddle_right
+        # Apakah bola ada dalam rentang vertikal paddle?
+        collision_y = ball_bottom <= paddle_top and self.ball.y >= paddle_bottom
+
+        if collision_x and collision_y:
+            # Pastikan bola bergerak ke bawah saat menabrak (supaya tidak nyangkut)
+            if self.ball.vy < 0:
+                self.ball.vy *= -1  # Pantulkan ke atas
+
+                # --- Efek Sudut Pantulan (English Effect) ---
+                # Hitung jarak titik tabrakan dari tengah paddle (-1.0 s/d 1.0)
+                hit_pos = (self.ball.x - self.paddle.x) / (self.paddle.width / 2)
+
+                # Ubah kecepatan horizontal (vx) berdasarkan posisi kena
+                # Kena tengah = 0, Kena pinggir = miring tajam
+                self.ball.vx = hit_pos * self.ball.speed * 0.8
+
+                # Dorong bola sedikit ke atas supaya tidak terjebak di dalam paddle
+                self.ball.y = paddle_top + self.ball.radius + 0.01
+
+    def _check_brick_collision(self):
+        # Loop semua brick untuk cek tabrakan
+        for i, brick in enumerate(self.bricks):
+            if brick is None:
+                continue  # Brick sudah hancur, skip
+
+            # 1. Hitung batas bola
+            ball_left = self.ball.x - self.ball.radius
+            ball_right = self.ball.x + self.ball.radius
+            ball_top = self.ball.y + self.ball.radius
+            ball_bottom = self.ball.y - self.ball.radius
+
+            # 2. Hitung batas brick
+            brick_left = brick.x - brick.width / 2
+            brick_right = brick.x + brick.width / 2
+            brick_top = brick.y + brick.height / 2
+            brick_bottom = brick.y - brick.height / 2
+
+            # 3. Cek Interseksi AABB
+            if (ball_right >= brick_left and ball_left <= brick_right and
+                    ball_bottom <= brick_top and ball_top >= brick_bottom):
+
+                # --- HITUNG SISI TABRAKAN (RESOLUSI) ---
+                # Hitung seberapa dalam bola masuk ke brick dari tiap sisi
+                overlap_left = ball_right - brick_left
+                overlap_right = brick_right - ball_left
+                overlap_top = brick_top - ball_bottom
+                overlap_bottom = ball_top - brick_bottom
+
+                # Cari overlap terkecil untuk menentukan sisi tabrakan
+                min_overlap_x = min(overlap_left, overlap_right)
+                min_overlap_y = min(overlap_top, overlap_bottom)
+
+                # Jika overlap horizontal lebih kecil, berarti kena samping
+                if min_overlap_x < min_overlap_y:
+                    self.ball.vx *= -1
+                    # Koreksi posisi bola agar tidak nempel
+                    if overlap_left < overlap_right:
+                        self.ball.x = brick_left - self.ball.radius - 0.01
+                    else:
+                        self.ball.x = brick_right + self.ball.radius + 0.01
+                else:
+                    # Kena atas/bawah
+                    self.ball.vy *= -1
+                    # Koreksi posisi bola
+                    if overlap_bottom < overlap_top:
+                        self.ball.y = brick_bottom - self.ball.radius - 0.01
+                    else:
+                        self.ball.y = brick_top + self.ball.radius + 0.01
+
+                # 4. Hancurkan Brick
+                self.bricks[i] = None
+
+                # Break agar tidak menabrak 2 brick sekaligus dalam 1 frame (opsional tapi disarankan)
+                break
+
     def setup_camera(self):
         # Reset dan pasang kamera tiap frame
         glMatrixMode(GL_PROJECTION)
@@ -113,6 +203,9 @@ class Game:
             self.handle_input()
             dt = clock.get_time() / 1000.0  # detik
             self.ball.update(dt, self.table.width, self.table.height)
+
+            self._check_paddle_collision()
+            self._check_brick_collision()
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             self.setup_camera()
